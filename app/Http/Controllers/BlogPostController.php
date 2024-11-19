@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * Class BlogPostController
@@ -19,7 +20,10 @@ class BlogPostController extends Controller
      */
     public function index()
     {
-        return response()->json(BlogPost::all(), 200);
+        $blogPosts = Cache::remember('blog_posts', 60, function () {
+            return BlogPost::all();
+        });
+        return response()->json($blogPosts, 200);
     }
 
     /**
@@ -37,6 +41,8 @@ class BlogPostController extends Controller
         ]);
 
         $blogPost = BlogPost::create($validated);
+        Cache::forget('blog_posts');
+
         return response()->json($blogPost, 201);
     }
 
@@ -48,7 +54,10 @@ class BlogPostController extends Controller
      */
     public function show($id)
     {
-        $blogPost = BlogPost::find($id);
+        $blogPost = Cache::remember("blog_post_{$id}", 60, function () use ($id) {
+            return BlogPost::find($id);
+        });
+
         if (!$blogPost) {
             return response()->json(['error' => 'Blog post not found'], 404);
         }
@@ -76,6 +85,9 @@ class BlogPostController extends Controller
         ]);
 
         $blogPost->update($validated);
+        Cache::put("blog_post_{$id}", $blogPost, 60);
+        Cache::forget('blog_posts');
+
         return response()->json($blogPost, 200);
     }
 
@@ -93,6 +105,10 @@ class BlogPostController extends Controller
         }
 
         $blogPost->delete();
+
+        Cache::forget("blog_post_{$id}");
+        Cache::forget('blog_posts');
+
         return response()->json(['message' => 'Blog post deleted'], 200);
     }
 }
