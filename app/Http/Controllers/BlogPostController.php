@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PostMail;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * Class BlogPostController
@@ -42,6 +44,8 @@ class BlogPostController extends Controller
 
         $blogPost = BlogPost::create($validated);
         Cache::forget('blog_posts');
+
+        Mail::to('tdboy59@gmail.com')->send(new PostMail(['name' => 'Frootify Blog', 'title' => $blogPost->title]));
 
         return response()->json($blogPost, 201);
     }
