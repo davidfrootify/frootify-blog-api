@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\PostMail;
+use App\Mail\DynamicMail;
 use App\Models\BlogPost;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -114,5 +115,24 @@ class BlogPostController extends Controller
         Cache::forget('blog_posts');
 
         return response()->json(['message' => 'Blog post deleted'], 200);
+    }
+
+
+    public function sendMail()
+    {
+        $emailData = [
+            'template' => 'emails.incorrect_password', // Path to Blade template
+            'subject' => 'Oops! Incorrect Password',
+            'title' => "Let's Get You Back In!",
+            'banner_text' => 'Quick fix, big impact.',
+            'name' => 'John Doe',
+            'body' => "Looks like you hit a little snag with your Frootify password. Don't sweat it, let's get you back on track!",
+            'url' => 'https://example.com/reset-password',
+            'button_text' => 'Reset Password',
+        ];
+
+        Mail::to('john@example.com')->send(new DynamicMail($emailData));
+
+        return "Email sent successfully!";
     }
 }

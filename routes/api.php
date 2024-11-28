@@ -14,6 +14,9 @@ Route::get('/blog-posts/{id}', [BlogPostController::class, 'show']);
 Route::put('/blog-posts/{id}', [BlogPostController::class, 'update']);
 Route::delete('/blog-posts/{id}', [BlogPostController::class, 'destroy']);
 
+Route::get('/send-email/{type}', [BlogPostController::class, 'sendEmail']);
+
+
 Route::get('/test-cache', function () {
     Cache::put('test_key', 'This is a test value', 60);
 
