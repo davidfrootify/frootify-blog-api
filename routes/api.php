@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BlogPostController;
+use App\Http\Controllers\EmailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -14,8 +15,8 @@ Route::get('/blog-posts/{id}', [BlogPostController::class, 'show']);
 Route::put('/blog-posts/{id}', [BlogPostController::class, 'update']);
 Route::delete('/blog-posts/{id}', [BlogPostController::class, 'destroy']);
 
-Route::get('/send-email/{type}', [BlogPostController::class, 'sendEmail']);
-
+Route::post('/send-email/{type}', [EmailController::class, 'sendEmail']);
+Route::get('/send-email/{type}', [EmailController::class, 'sendEmail']);
 
 Route::get('/test-cache', function () {
     Cache::put('test_key', 'This is a test value', 60);
