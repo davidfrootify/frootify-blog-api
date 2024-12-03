@@ -6,6 +6,11 @@ use App\Mail\DynamicMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
+/**
+ * Class EmailController
+ *
+ * Controller for handling email-related actions.
+ */
 class EmailController extends Controller
 {
     /**
@@ -33,6 +38,11 @@ class EmailController extends Controller
         return response()->json(['message' => ucfirst($type) . ' email sent successfully!']);
     }
 
+    /**
+     * Get the email configurations for different email types.
+     *
+     * @return array The email configurations
+     */
     private function getEmailConfigurations()
     {
         return [
