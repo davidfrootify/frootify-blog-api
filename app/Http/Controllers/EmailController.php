@@ -17,8 +17,25 @@ class EmailController extends Controller
      */
     public function sendEmail($type, Request $request)
     {
-        // Email configurations
-        $emailConfigurations = [
+        $emailConfigurations = $this->getEmailConfigurations();
+
+        if (!array_key_exists($type, $emailConfigurations)) {
+            return response()->json(['error' => 'Invalid email type'], 400);
+        }
+
+        $emailConfig = $emailConfigurations[$type];
+        $emailData = array_merge($emailConfig['defaults'], $request->all());
+
+        Mail::to($request->input('recipient'))->send(
+            new DynamicMail($emailConfig['template'], $emailConfig['subject'], $emailData)
+        );
+
+        return response()->json(['message' => ucfirst($type) . ' email sent successfully!']);
+    }
+
+    private function getEmailConfigurations()
+    {
+        return [
             'reset_password' => [
                 'template' => 'emails.reset_password',
                 'subject' => 'You\'ve Got Mail... and a Password Reset Link!',
@@ -263,32 +280,11 @@ class EmailController extends Controller
                     'title' => 'Your Cart is Waiting',
                     'banner_text' => 'Don\'t Miss Out on Your Favorites',
                     'username' => 'Frooty',
-                    'items' => ['Apple', 'Orange', 'Grapes'], // Example items
+                    'items' => ['Apple', 'Orange', 'Grapes'],
                     'button_text' => 'Complete Your Order',
                     'link' => 'https://frootify.tech/cart',
                 ],
             ],
-
-
-
         ];
-
-        // Validating the email type
-        if (!array_key_exists($type, $emailConfigurations)) {
-            return response()->json(['error' => 'Invalid email type'], 400);
-        }
-
-        $emailConfig = $emailConfigurations[$type];
-
-        // Prepare email data
-        $emailData = array_merge($emailConfig['defaults'], $request->all());
-
-        // Send the email
-        Mail::to($request->input('recipient'))->send(
-            new DynamicMail($emailConfig['template'], $emailConfig['subject'], $emailData)
-        );
-
-        return response()->json(['message' => ucfirst($type) . ' email sent successfully!']);
     }
 }
-
